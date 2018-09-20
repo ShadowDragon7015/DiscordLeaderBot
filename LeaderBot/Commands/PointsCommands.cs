@@ -42,7 +42,7 @@ namespace LeaderBot.Commands
 
         }
 
-        [Command("getPoints"), Summary("gets user total points")]
+        [Command("getPoints"), Summary("gets user total points"), Alias("Points","MyPoints","get points")]
         public async Task getPoints([Summary("The user to get point total from")] SocketGuildUser userName = null)
         {
             if (userName == null)
