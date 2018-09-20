@@ -6,7 +6,8 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using System.Text;
+using System.Linq;
 
 namespace LeaderBot {
 	/// <summary>
@@ -34,12 +35,8 @@ namespace LeaderBot {
 		/// <returns>The mongo collection</returns>
 		/// <param name="collectionName">Collection name in the MongoDB</param>
 		public static void SetupMongoDatabase() {
-			string connectionString = null;
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-				connectionString = "mongodb://localhost:27017";
-			else {
-				connectionString = Resources.mongoconnection;
-			}
+			string connectionString = Resources.mongoconnection;
+
 			Client = new MongoClient(connectionString);
 			Database = Client.GetDatabase("Leaderbot");
 
@@ -178,5 +175,31 @@ namespace LeaderBot {
 			};
 			Collection.InsertOneAsync(document);
 		}
+
+        public static StringBuilder boardtitlecard(String boardname)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.Append("```css\n");
+            string titleString = "Username".PadRight(30) + $"| Total {boardname}";
+            stringBuilder.Append(titleString);
+            stringBuilder.Append("\n".PadRight(titleString.Length + 1, '-') + "\n");
+            return stringBuilder;
+        }
+
+        public static StringBuilder createLeaderboard(StringBuilder TitleCard, Dictionary<SocketGuildUser, int> allusers, int userCount){
+            if (allusers.Count > 0){
+                var sortedDict = from entry in allusers orderby entry.Value descending select entry;
+                int i = 0;
+                foreach (var entry in sortedDict){
+                    TitleCard.Append(entry.Key.ToString().PadRight(30) + "|\t" + entry.Value + "\n");
+                    ++i;
+                    if (i >= userCount){
+                        break;
+                    }
+                }
+                TitleCard.Append("```");
+            }
+            return TitleCard;
+        }
 	}
 }
